@@ -22,10 +22,12 @@ Or install it yourself as:
 
 ## Usage
 
-First, you need to [register for an access token](https://mds2.fidoalliance.org/tokens/). You can configure the gem as follows:
+First, you need to [register for an access token](https://mds2.fidoalliance.org/tokens/) and configure a cache backend.
+The cache interface is compatible with Rails' [`ActiveSupport::Cache::Store`](https://api.rubyonrails.org/classes/ActiveSupport/Cache/Store.html), which means you can configure the gem to use your existing cache or a separate one:
 ```ruby
 FidoMetadata.configure do |config|
   config.metadata_token = "your token"
+  config.cache_backend = Rails.cache # or something like `ActiveSupport::Cache::FileStore.new(...)`
 end
 ```
 
@@ -33,9 +35,8 @@ Then you can query the table of contents (TOC):
 ```ruby
 store = FidoMetadata::Store.new
 toc = store.table_of_contents
-# `toc.entries` returns an array of FidoMetadata::Entry objects, see
+# returns a FidoMetadata::TableOfContents object. `toc.entries` returns an array of FidoMetadata::Entry objects, see
 # https://fidoalliance.org/specs/fido-v2.0-ps-20170927/fido-metadata-service-v2.0-ps-20170927.html#metadata-toc-payload-entry-dictionary
-  
 ```
 
 Retrieve metadata statement via the authenticator `aaguid` (FIDO2) or `attestation_certificate_key_id` (U2F):
@@ -45,23 +46,16 @@ store.fetch_statement(aaguid: "0132d110-bf4e-4208-a403-ab4f5f12efe5")
 # https://fidoalliance.org/specs/fido-v2.0-ps-20170927/fido-metadata-statement-v2.0-ps-20170927.html#types
 ```
 
-### Integrating the cache backend
-    
-The cache interface is compatible with Rails' [`ActiveSupport::Cache::Store`](https://api.rubyonrails.org/classes/ActiveSupport/Cache/Store.html), which means you can configure the gem to use your existing cache or a separate one: 
+### Custom cache backend
 
-```ruby
-FidoMetadata.configure do |config|
-  config.cache_backend = Rails.cache # or something like `ActiveSupport::Cache::FileStore.new(...)`
-end
-``` 
-
-It is also possible to implement your own backend for using any datastore you'd like, such as your database. The interface you need to implement is as follows:
+It is possible to implement your own backend for using any datastore you'd like, such as your database. The interface you need to implement is as follows:
 
 ```ruby
 class CustomMetadataCacheStore
   def read(name, _options = nil)
     # deserialize and return `value`
   end
+
   def write(name, value, _options = nil)
     # serialize and store `value` so it can be looked up using `name`
   end
