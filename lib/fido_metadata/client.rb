@@ -3,13 +3,15 @@
 require "jwt"
 require "net/http"
 require "openssl"
-require "securecompare"
+require "fido_metadata/refinement/fixed_length_secure_compare"
 
 module FidoMetadata
   class Client
     class DataIntegrityError < StandardError; end
     class InvalidHashError < DataIntegrityError; end
     class UnverifiedSigningKeyError < DataIntegrityError; end
+
+    using Refinement::FixedLengthSecureCompare
 
     DEFAULT_HEADERS = {
       "Content-Type" => "application/json",
@@ -38,7 +40,8 @@ module FidoMetadata
 
     def download_entry(uri, expected_hash:)
       response = get_with_token(uri)
-      unless SecureCompare.compare(OpenSSL::Digest::SHA256.digest(response), Base64.urlsafe_decode64(expected_hash))
+      decoded_hash = Base64.urlsafe_decode64(expected_hash)
+      unless OpenSSL.fixed_length_secure_compare(OpenSSL::Digest::SHA256.digest(response), decoded_hash)
         raise(InvalidHashError)
       end
 

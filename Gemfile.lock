@@ -3,7 +3,6 @@ PATH
   specs:
     fido_metadata (0.1.0)
       jwt (~> 2.0)
-      securecompare (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -54,7 +53,6 @@ GEM
       unicode-display_width (>= 1.4.0, < 1.7)
     ruby-progressbar (1.10.1)
     safe_yaml (1.0.5)
-    securecompare (1.0.0)
     unicode-display_width (1.6.0)
     webmock (3.7.6)
       addressable (>= 2.3.6)
