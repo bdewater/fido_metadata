@@ -17,14 +17,9 @@ RSpec.describe FidoMetadata::Client do
   context "#download_toc" do
     let(:toc) { File.read(SUPPORT_PATH.join("mds_toc.txt")) }
     let(:response) { { status: 200, body: toc } }
-    let(:trust_store) do
-      store = OpenSSL::X509::Store.new
-      store.purpose = OpenSSL::X509::PURPOSE_ANY
-      store.flags = OpenSSL::X509::V_FLAG_CRL_CHECK | OpenSSL::X509::V_FLAG_CRL_CHECK_ALL
+    let(:trusted_cert) do
       file = File.read(SUPPORT_PATH.join("MDSROOT.crt"))
-      store.add_cert(OpenSSL::X509::Certificate.new(file))
-      store.time = current_time.to_i
-      store
+      OpenSSL::X509::Certificate.new(file)
     end
     let(:mdcsa_crl) { { status: 200, body: File.read(SUPPORT_PATH.join("MDSCA-1.crl")) } }
     let(:mdsroot_crl) { { status: 200, body: File.read(SUPPORT_PATH.join("MDSROOT.crl")) } }
@@ -36,9 +31,15 @@ RSpec.describe FidoMetadata::Client do
         :get,
         "https://fidoalliance.co.nz/safetynetpki/crl/FIDO%20Fake%20Root%20Certificate%20Authority%202018.crl"
       ).to_return(status: 404)
+
+      allow(FidoMetadata::X5cKeyFinder).to receive(:build_store).and_wrap_original do |method, *args|
+        store = method.call(*args)
+        store.time = current_time.to_i
+        store
+      end
     end
 
-    subject { described_class.new(fake_token).download_toc(uri, trust_store: trust_store) }
+    subject { described_class.new(fake_token).download_toc(uri, trusted_certs: [trusted_cert]) }
 
     context "when everything's in place" do
       it "returns a MetadataTOCPayload hash with the required keys" do
@@ -55,9 +56,9 @@ RSpec.describe FidoMetadata::Client do
         let(:toc) { File.read(SUPPORT_PATH.join("mds_toc_invalid_chain.txt")) }
 
         specify do
-          expect { subject }.to raise_error(
-            described_class::UnverifiedSigningKeyError, "OpenSSL error 20 (unable to get local issuer certificate)"
-          )
+          error = "Certificate verification failed: unable to get local issuer certificate. Certificate subject: " \
+           "/C=US/O=FIDO Alliance/OU=FAKE Metadata TOC Signing FAKE/CN=FAKE Metadata TOC Signer 4 FAKE."
+          expect { subject }.to raise_error(described_class::UnverifiedSigningKeyError, error)
         end
       end
 
@@ -65,9 +66,9 @@ RSpec.describe FidoMetadata::Client do
         let(:toc) { File.read(SUPPORT_PATH.join("mds_toc_revoked.txt")) }
 
         specify do
-          expect { subject }.to raise_error(
-            described_class::UnverifiedSigningKeyError, "OpenSSL error 23 (certificate revoked)"
-          )
+          error = "Certificate verification failed: certificate revoked. Certificate subject: " \
+           "/C=US/O=FIDO Alliance/OU=FAKE Metadata TOC Signing FAKE/CN=FAKE Metadata TOC Signer 4 FAKE."
+          expect { subject }.to raise_error(described_class::UnverifiedSigningKeyError, error)
         end
       end
     end
@@ -100,9 +101,9 @@ RSpec.describe FidoMetadata::Client do
       let(:mdcsa_crl) { { status: 404 } }
 
       specify do
-        expect { subject }.to raise_error(
-          described_class::UnverifiedSigningKeyError, "OpenSSL error 3 (unable to get certificate CRL)"
-        )
+        error = "Certificate verification failed: unable to get certificate CRL. Certificate subject: " \
+           "/C=US/O=FIDO Alliance/OU=FAKE Metadata TOC Signing FAKE/CN=FAKE Metadata TOC Signer 4 FAKE."
+        expect { subject }.to raise_error(described_class::UnverifiedSigningKeyError, error)
       end
     end
 
@@ -118,9 +119,9 @@ RSpec.describe FidoMetadata::Client do
       let(:current_time) { Time.utc(2049, 1, 1) }
 
       specify do
-        expect { subject }.to raise_error(
-          described_class::UnverifiedSigningKeyError, "OpenSSL error 12 (CRL has expired)"
-        )
+        error = "Certificate verification failed: CRL has expired. Certificate subject: " \
+           "/C=US/O=FIDO Alliance/OU=FAKE Metadata TOC Signing FAKE/CN=FAKE Metadata TOC Signer 4 FAKE."
+        expect { subject }.to raise_error(described_class::UnverifiedSigningKeyError, error)
       end
     end
   end
