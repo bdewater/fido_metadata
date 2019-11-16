@@ -38,6 +38,12 @@ RSpec.describe FidoMetadata::Statement do
         max_retries: 5,
       )
     end
+
+    context "#trust_store" do
+      it "returns a OpenSSL::X509::Store" do
+        expect(subject.trust_store).to be_a(OpenSSL::X509::Store)
+      end
+    end
   end
 
   context "U2F" do
@@ -60,6 +66,12 @@ RSpec.describe FidoMetadata::Statement do
         user_verification: "PRESENCE"
       )
     end
+
+    context "#trust_store" do
+      it "returns a OpenSSL::X509::Store" do
+        expect(subject.trust_store).to be_a(OpenSSL::X509::Store)
+      end
+    end
   end
 
   context "FIDO2" do
@@ -81,6 +93,12 @@ RSpec.describe FidoMetadata::Statement do
       expect(subject.user_verification_details.first.first).to have_attributes(
         user_verification: "PRESENCE"
       )
+    end
+
+    context "#trust_store" do
+      it "returns a OpenSSL::X509::Store" do
+        expect(subject.trust_store).to be_a(OpenSSL::X509::Store)
+      end
     end
   end
 end

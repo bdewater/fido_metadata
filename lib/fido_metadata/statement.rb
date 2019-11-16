@@ -53,5 +53,13 @@ module FidoMetadata
     def attestation_root_certificates
       Coercer::Certificates.coerce(@attestation_root_certificates)
     end
+
+    def trust_store
+      trust_store = OpenSSL::X509::Store.new
+      attestation_root_certificates.each do |certificate|
+        trust_store.add_cert(certificate)
+      end
+      trust_store
+    end
   end
 end
