@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fido_metadata (0.1.0)
+    fido_metadata (0.2.0)
       jwt (~> 2.0)
 
 GEM
