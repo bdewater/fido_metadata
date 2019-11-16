@@ -12,10 +12,10 @@ FidoMetadata.configure do |config|
 end
 
 unless FidoMetadata.configuration.metadata_token
-  puts <<~EOS
+  puts <<~TOKEN_HINT
     No MDS token configured via the MDS_TOKEN environment variable.
     Set one for this session: FidoMetadata.configuration.metadata_token = 'your token'
-  EOS
+  TOKEN_HINT
 end
 puts "Reset the cache via: FidoMetadata.configuration.cache_backend.clear"
 
