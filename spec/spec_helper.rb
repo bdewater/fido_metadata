@@ -4,7 +4,7 @@ require "bundler/setup"
 require "fido_metadata"
 
 require "pry-byebug"
-require_relative "support/test_cache_store"
+require "fido_metadata/test_cache_store"
 require "webmock/rspec"
 
 SUPPORT_PATH = Pathname.new(File.expand_path(File.join(__dir__, "support")))
@@ -22,7 +22,7 @@ RSpec.configure do |config|
 
   config.before do
     FidoMetadata.configure do |metadata_config|
-      metadata_config.cache_backend = TestCacheStore.new
+      metadata_config.cache_backend = FidoMetadata::TestCacheStore.new
     end
   end
 

@@ -5,10 +5,10 @@ require "bundler/setup"
 require "fido_metadata"
 
 # Configure in-memory cache
-require_relative "../spec/support/test_cache_store"
+require "fido_metadata/test_cache_store"
 FidoMetadata.configure do |config|
   config.metadata_token = ENV["MDS_TOKEN"]
-  config.cache_backend = TestCacheStore.new
+  config.cache_backend = FidoMetadata::TestCacheStore.new
 end
 
 unless FidoMetadata.configuration.metadata_token
