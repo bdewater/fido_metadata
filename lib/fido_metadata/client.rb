@@ -5,6 +5,7 @@ require "net/http"
 require "openssl"
 require "fido_metadata/refinement/fixed_length_secure_compare"
 require "fido_metadata/x5c_key_finder"
+require "fido_metadata/version"
 
 module FidoMetadata
   class Client
