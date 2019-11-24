@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2019-11-24
+### Changed
+- Made `FidoMetada::TestCacheStore` available for gem users. It is not required by default.
+
 ## [0.2.0] - 2019-11-16
 ### Added
 - This CHANGELOG.md file.
@@ -22,5 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extracted from [webauthn-ruby PR 208](https://github.com/cedarcode/webauthn-ruby/pull/208) after discussion with the maintainers. Thanks for the feedback @grzuy and @brauliomartinezlm!
 
 [Unreleased]: https://github.com/bdewater/fido_metadata/compare/v0.2.0...HEAD
+[0.3.0]: https://github.com/bdewater/fido_metadata/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bdewater/fido_metadata/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bdewater/fido_metadata/releases/tag/v0.1.0
