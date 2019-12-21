@@ -8,6 +8,9 @@ RSpec.describe FidoMetadata::X5cKeyFinder do
   let(:root_dn) { OpenSSL::X509::Name.parse("/DC=org/DC=fake-ca/CN=Fake CA") }
   let(:root_certificate) do
     cert = generate_cert(root_dn, root_key, 1)
+    ef = OpenSSL::X509::ExtensionFactory.new
+    cert.add_extension(ef.create_extension("basicConstraints", "CA:TRUE", true))
+    cert.add_extension(ef.create_extension("keyUsage", "cRLSign,keyCertSign", true))
     cert.sign(root_key, "sha256")
     cert
   end
@@ -44,7 +47,7 @@ RSpec.describe FidoMetadata::X5cKeyFinder do
 
   it "returns the public key from a certificate that is signed by trusted roots and not revoked" do
     expect(keyfinder).to be_a(OpenSSL::PKey::RSA)
-    expect(keyfinder.public_key.to_der).to eq(leaf_certificate.public_key.to_der)
+    expect(keyfinder.to_pem).to eq(leaf_certificate.public_key.to_pem)
   end
 
   context "already parsed certificates" do
@@ -52,7 +55,7 @@ RSpec.describe FidoMetadata::X5cKeyFinder do
 
     it "returns the public key from a certificate that is signed by trusted roots and not revoked" do
       expect(keyfinder).to be_a(OpenSSL::PKey::RSA)
-      expect(keyfinder.public_key.to_der).to eq(leaf_certificate.public_key.to_der)
+      expect(keyfinder.to_pem).to eq(leaf_certificate.public_key.to_pem)
     end
   end
 
