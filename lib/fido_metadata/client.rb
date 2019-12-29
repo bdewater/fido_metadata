@@ -27,7 +27,7 @@ module FidoMetadata
       @token = token
     end
 
-    def download_toc(uri, trusted_certs: FIDO_ROOT_CERTIFICATES)
+    def download_toc(uri, trusted_certs: FIDO_ROOT_CERTIFICATES, time: Time.now)
       response = get_with_token(uri)
       payload, _ = JWT.decode(response, nil, true, algorithms: ["ES256"]) do |headers|
         jwt_certificates = headers["x5c"].map do |encoded|
@@ -36,7 +36,7 @@ module FidoMetadata
         crls = download_crls(jwt_certificates)
 
         begin
-          X5cKeyFinder.from(jwt_certificates, trusted_certs, crls)
+          X5cKeyFinder.from(jwt_certificates, trusted_certs, crls, time: time)
         rescue JWT::VerificationError => e
           raise(UnverifiedSigningKeyError, e.message)
         end

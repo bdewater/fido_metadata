@@ -11,7 +11,6 @@ RSpec.describe FidoMetadata::Client do
 
   before(:each) do
     stub_request(:get, uri).with(query: { "token" => fake_token }).to_return(response)
-    allow(Time).to receive(:now).and_return(current_time)
   end
 
   context "#download_toc" do
@@ -31,15 +30,9 @@ RSpec.describe FidoMetadata::Client do
         :get,
         "https://fidoalliance.co.nz/safetynetpki/crl/FIDO%20Fake%20Root%20Certificate%20Authority%202018.crl"
       ).to_return(status: 404)
-
-      allow(FidoMetadata::X5cKeyFinder).to receive(:build_store).and_wrap_original do |method, *args|
-        store = method.call(*args)
-        store.time = current_time.to_i
-        store
-      end
     end
 
-    subject { described_class.new(fake_token).download_toc(uri, trusted_certs: [trusted_cert]) }
+    subject { described_class.new(fake_token).download_toc(uri, trusted_certs: [trusted_cert], time: current_time) }
 
     context "when everything's in place" do
       it "returns a MetadataTOCPayload hash with the required keys" do

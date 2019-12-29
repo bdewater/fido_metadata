@@ -11,10 +11,11 @@ module FidoMetadata
   # key from the first certificate.
   # See https://tools.ietf.org/html/rfc7515#section-4.1.6
   class X5cKeyFinder
-    def self.from(x5c_header_or_certificates, trusted_certificates, crls)
+    def self.from(x5c_header_or_certificates, trusted_certificates, crls, time: Time.now)
       store = build_store(trusted_certificates, crls)
       signing_certificate, *certificate_chain = parse_certificates(x5c_header_or_certificates)
       store_context = OpenSSL::X509::StoreContext.new(store, signing_certificate, certificate_chain)
+      store_context.time = time
 
       if store_context.verify
         signing_certificate.public_key
