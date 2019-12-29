@@ -7,10 +7,12 @@ require "fido_metadata/statement"
 module FidoMetadata
   class Store
     METADATA_ENDPOINT = URI("https://mds2.fidoalliance.org/")
+    TOC_CACHE_KEY = "metadata_toc"
+    STATEMENT_CACHE_KEY = "statement_%s"
 
     def table_of_contents
       @table_of_contents ||= begin
-        key = "metadata_toc"
+        key = TOC_CACHE_KEY
         toc = cache_backend.read(key)
         return toc if toc
 
@@ -38,7 +40,7 @@ module FidoMetadata
     def fetch_statement(aaguid: nil, attestation_certificate_key_id: nil)
       verify_arguments(aaguid: aaguid, attestation_certificate_key_id: attestation_certificate_key_id)
 
-      key = "statement_#{aaguid || attestation_certificate_key_id}"
+      key = STATEMENT_CACHE_KEY % (aaguid || attestation_certificate_key_id)
       statement = cache_backend.read(key)
       return statement if statement
 

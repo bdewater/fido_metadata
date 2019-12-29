@@ -24,7 +24,7 @@ RSpec.describe FidoMetadata::Store do
   let(:client) { instance_double(FidoMetadata::Client) }
 
   before do
-    FidoMetadata.configuration.cache_backend.write("metadata_toc", toc)
+    FidoMetadata.configuration.cache_backend.write(described_class::TOC_CACHE_KEY, toc)
     FidoMetadata.configuration.metadata_token = "foo"
     allow(FidoMetadata::Client).to receive(:new).and_return(client)
   end
@@ -116,7 +116,7 @@ RSpec.describe FidoMetadata::Store do
         statement.aaguid = aaguid
         statement
       end
-      let(:statement_cache_key) { "statement_#{aaguid}" }
+      let(:statement_cache_key) { described_class::STATEMENT_CACHE_KEY % aaguid }
 
       before do
         FidoMetadata.configuration.cache_backend.write(statement_cache_key, statement)
@@ -156,7 +156,7 @@ RSpec.describe FidoMetadata::Store do
         statement.attestation_certificate_key_identifiers = [attestation_certificate_key_id]
         statement
       end
-      let(:statement_cache_key) { "statement_#{attestation_certificate_key_id}" }
+      let(:statement_cache_key) { described_class::STATEMENT_CACHE_KEY % attestation_certificate_key_id }
 
       before do
         FidoMetadata.configuration.cache_backend.write(statement_cache_key, statement)
