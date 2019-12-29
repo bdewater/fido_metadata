@@ -16,7 +16,7 @@ module FidoMetadata
 
         json = client.download_toc(METADATA_ENDPOINT)
         toc = FidoMetadata::TableOfContents.from_json(json)
-        cache_backend.write(key, toc)
+        cache_backend.write(key, toc, expires_in: toc.expires_in, race_condition_ttl: race_condition_ttl)
         toc
       end
     end
@@ -51,7 +51,12 @@ module FidoMetadata
 
       json = client.download_entry(entry.url, expected_hash: entry.hash)
       statement = FidoMetadata::Statement.from_json(json)
-      cache_backend.write(key, statement)
+      cache_backend.write(
+        key,
+        statement,
+        expires_in: table_of_contents.expires_in,
+        race_condition_ttl: race_condition_ttl
+      )
       statement
     end
 
@@ -73,6 +78,10 @@ module FidoMetadata
 
     def metadata_token
       FidoMetadata.configuration.metadata_token || raise("no metadata_token configured")
+    end
+
+    def race_condition_ttl
+      FidoMetadata.configuration.race_condition_ttl
     end
 
     def client

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2019-12-28
+### Added
+- Set `expires_in` and `race_condition_ttl` options during caching.
+
 ## [0.3.0] - 2019-11-24
 ### Changed
 - Made `FidoMetada::TestCacheStore` available for gem users. It is not required by default.
@@ -26,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extracted from [webauthn-ruby PR 208](https://github.com/cedarcode/webauthn-ruby/pull/208) after discussion with the maintainers. Thanks for the feedback @grzuy and @brauliomartinezlm!
 
 [Unreleased]: https://github.com/bdewater/fido_metadata/compare/v0.2.0...HEAD
+[0.4.0]: https://github.com/bdewater/fido_metadata/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bdewater/fido_metadata/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bdewater/fido_metadata/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bdewater/fido_metadata/releases/tag/v0.1.0

@@ -13,9 +13,11 @@ RSpec.describe FidoMetadata::Store do
   end
 
   let(:toc_entries) { [entry] }
+  let(:toc_next_update) { Date.today + 1 }
   let(:toc) do
     toc = FidoMetadata::TableOfContents.new
     toc.entries = toc_entries
+    toc.next_update = toc_next_update
     toc
   end
 
@@ -63,7 +65,10 @@ RSpec.describe FidoMetadata::Store do
         before { FidoMetadata.configuration.cache_backend.clear }
 
         it "downloads and returns the TOC" do
-          expect(client).to receive(:download_toc).and_return("entries" => [{ "aaguid" => aaguid }])
+          expect(client).to receive(:download_toc).and_return(
+            "nextUpdate" => toc_next_update,
+            "entries" => [{ "aaguid" => aaguid }]
+          )
           expect(subject.aaguid).to eq(aaguid)
         end
       end
@@ -95,6 +100,7 @@ RSpec.describe FidoMetadata::Store do
 
         it "downloads and returns the TOC" do
           expect(client).to receive(:download_toc).and_return(
+            "nextUpdate" => toc_next_update,
             "entries" => [{ "attestationCertificateKeyIdentifiers" => [attestation_certificate_key_id] }]
           )
           expect(subject.attestation_certificate_key_identifiers).to eq([attestation_certificate_key_id])
