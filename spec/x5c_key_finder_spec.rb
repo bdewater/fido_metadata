@@ -23,7 +23,7 @@ RSpec.describe FidoMetadata::X5cKeyFinder do
   let(:leaf_certificate) do
     cert = generate_cert(
       leaf_dn,
-      leaf_key,
+      leaf_key.public_key,
       leaf_serial,
       issuer: root_certificate,
       not_after: leaf_not_after
