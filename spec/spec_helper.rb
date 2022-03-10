@@ -3,7 +3,6 @@
 require "bundler/setup"
 require "fido_metadata"
 
-require "pry-byebug"
 require "fido_metadata/test_cache_store"
 require "webmock/rspec"
 
