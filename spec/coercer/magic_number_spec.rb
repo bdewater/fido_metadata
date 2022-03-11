@@ -4,13 +4,15 @@ require "spec_helper"
 require "fido_metadata/coercer/magic_number"
 
 RSpec.describe FidoMetadata::Coercer::MagicNumber do
-  MAPPING = {
-    1 => "foo",
-    2 => "bar",
-  }.freeze
+  let(:bit_mapping) do
+    {
+      1 => "foo",
+      2 => "bar",
+    }.freeze
+  end
 
   context "array: false" do
-    subject { described_class.new(MAPPING, array: false).coerce(value) }
+    subject { described_class.new(bit_mapping, array: false).coerce(value) }
 
     context "when the value is not an Integer" do
       let(:value) { "foo" }
@@ -38,7 +40,7 @@ RSpec.describe FidoMetadata::Coercer::MagicNumber do
   end
 
   context "array: true" do
-    subject { described_class.new(MAPPING, array: true).coerce(value) }
+    subject { described_class.new(bit_mapping, array: true).coerce(value) }
 
     context "when the value is not an Array of Integer" do
       let(:value) { ["foo"] }
@@ -60,7 +62,7 @@ RSpec.describe FidoMetadata::Coercer::MagicNumber do
       let(:value) { [1, 2] }
 
       it "returns the keys' values" do
-        expect(subject).to match_array(["foo", "bar"])
+        expect(subject).to match_array(%w[foo bar])
       end
     end
   end
