@@ -4,14 +4,16 @@ require "spec_helper"
 require "fido_metadata/coercer/bit_field"
 
 RSpec.describe FidoMetadata::Coercer::BitField do
-  CONSTANTS = {
-    0b0001 => "foo",
-    0b0010 => "bar",
-    0b0100 => "baz",
-  }.freeze
+  let(:bit_constants) do
+    {
+      0b0001 => "foo",
+      0b0010 => "bar",
+      0b0100 => "baz",
+    }.freeze
+  end
 
   context "multiple values" do
-    subject { described_class.new(CONSTANTS, single_value: false).coerce(value) }
+    subject { described_class.new(bit_constants, single_value: false).coerce(value) }
 
     context "when the flag is not known" do
       let(:value) { 0b1000 }
@@ -25,13 +27,13 @@ RSpec.describe FidoMetadata::Coercer::BitField do
       let(:value) { 0b0011 }
 
       it "returns an array with the values" do
-        expect(subject).to match_array(["foo", "bar"])
+        expect(subject).to match_array(%w[foo bar])
       end
     end
   end
 
   context "single value" do
-    subject { described_class.new(CONSTANTS, single_value: true).coerce(value) }
+    subject { described_class.new(bit_constants, single_value: true).coerce(value) }
 
     context "when the flag is not known" do
       let(:value) { 0b1000 }

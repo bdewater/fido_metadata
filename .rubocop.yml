@@ -3,7 +3,7 @@ inherit_mode:
     - AllowedNames
 
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.5
   DisabledByDefault: true
   Exclude:
     - "gemfiles/**/*"
@@ -31,9 +31,6 @@ Security:
   Enabled: true
 
 Style/BlockComments:
-  Enabled: true
-
-Style/BracesAroundHashParameters:
   Enabled: true
 
 Style/CaseEquality:
@@ -141,7 +138,13 @@ Style/RedundantException:
 Style/RedundantFreeze:
   Enabled: true
 
+Style/RedundantInterpolation:
+  Enabled: true
+
 Style/RedundantParentheses:
+  Enabled: true
+
+Style/RedundantPercentQ:
   Enabled: true
 
 Style/RedundantReturn:
@@ -179,12 +182,6 @@ Style/TrailingMethodEndStatement:
   Enabled: true
 
 Style/TrivialAccessors:
-  Enabled: true
-
-Style/UnneededInterpolation:
-  Enabled: true
-
-Style/UnneededPercentQ:
   Enabled: true
 
 Style/UnpackFirst:

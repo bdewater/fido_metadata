@@ -87,13 +87,11 @@ module FidoMetadata
       uris = extract_crl_distribution_points(certificates)
 
       crls = uris.compact.uniq.map do |uri|
-        begin
-          get(uri)
-        rescue Net::ProtocolError
-          # TODO: figure out why test endpoint specifies a missing and unused CRL in the cert chain, and see if this
-          # rescue can be removed. If the CRL is used, OpenSSL error 3 (unable to get certificate CRL) will raise.
-          nil
-        end
+        get(uri)
+      rescue Net::ProtocolError
+        # TODO: figure out why test endpoint specifies a missing and unused CRL in the cert chain, and see if this
+        # rescue can be removed. If the CRL is used, OpenSSL error 3 (unable to get certificate CRL) will raise.
+        nil
       end
       crls.compact.map { |crl| OpenSSL::X509::CRL.new(crl) }
     end
