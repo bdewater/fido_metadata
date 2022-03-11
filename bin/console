@@ -20,5 +20,4 @@ end
 puts "Reset the cache via: FidoMetadata.configuration.cache_backend.clear"
 
 # Start REPL
-require "pry-byebug"
 Pry.start
