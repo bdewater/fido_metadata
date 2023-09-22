@@ -26,7 +26,6 @@ First, you need to [register for an access token](https://mds2.fidoalliance.org/
 The cache interface is compatible with Rails' [`ActiveSupport::Cache::Store`](https://api.rubyonrails.org/classes/ActiveSupport/Cache/Store.html), which means you can configure the gem to use your existing cache or a separate one:
 ```ruby
 FidoMetadata.configure do |config|
-  config.metadata_token = "your token"
   config.cache_backend = Rails.cache # or something like `ActiveSupport::Cache::FileStore.new(...)`
 end
 ```
