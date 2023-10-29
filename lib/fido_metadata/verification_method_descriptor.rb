@@ -2,7 +2,6 @@
 
 require "fido_metadata/attributes"
 require "fido_metadata/biometric_accuracy_descriptor"
-require "fido_metadata/constants"
 require "fido_metadata/code_accuracy_descriptor"
 require "fido_metadata/pattern_accuracy_descriptor"
 require "fido_metadata/coercer/magic_number"
@@ -12,7 +11,7 @@ module FidoMetadata
   class VerificationMethodDescriptor
     extend Attributes
 
-    json_accessor("userVerification", Coercer::MagicNumber.new(Constants::USER_VERIFICATION_METHODS))
+    json_accessor("userVerificationMethod")
     json_accessor("caDesc")
     json_accessor("baDesc")
     json_accessor("paDesc")

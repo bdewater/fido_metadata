@@ -23,13 +23,9 @@ module FidoMetadata
       File.read(File.join(__dir__, "..", "Root.cer"))
     )].freeze
 
-    def initialize(token)
-      @token = token
-    end
-
     def download_toc(uri, trusted_certs: FIDO_ROOT_CERTIFICATES)
-      response = get_with_token(uri)
-      payload, _ = JWT.decode(response, nil, true, algorithms: ["ES256"]) do |headers|
+      response = get(uri)
+      payload, _ = JWT.decode(response, nil, true, algorithms: ["RS256"]) do |headers|
         jwt_certificates = headers["x5c"].map do |encoded|
           OpenSSL::X509::Certificate.new(Base64.strict_decode64(encoded))
         end
@@ -44,26 +40,7 @@ module FidoMetadata
       payload
     end
 
-    def download_entry(uri, expected_hash:)
-      response = get_with_token(uri)
-      decoded_hash = Base64.urlsafe_decode64(expected_hash)
-      unless OpenSSL.fixed_length_secure_compare(OpenSSL::Digest::SHA256.digest(response), decoded_hash)
-        raise(InvalidHashError)
-      end
-
-      decoded_body = Base64.urlsafe_decode64(response)
-      JSON.parse(decoded_body)
-    end
-
     private
-
-    def get_with_token(uri)
-      if @token && !@token.empty?
-        uri.path += "/" unless uri.path.end_with?("/")
-        uri.query = "token=#{@token}"
-      end
-      get(uri)
-    end
 
     def get(uri)
       get = Net::HTTP::Get.new(uri, DEFAULT_HEADERS)
@@ -73,14 +50,12 @@ module FidoMetadata
     end
 
     def http(uri)
-      @http ||= begin
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = uri.port == 443
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        http.open_timeout = 5
-        http.read_timeout = 5
-        http
-      end
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.port == 443
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      http.open_timeout = 5
+      http.read_timeout = 5
+      http
     end
 
     def download_crls(certificates)

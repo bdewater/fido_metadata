@@ -6,6 +6,7 @@ require "fido_metadata/status_report"
 require "fido_metadata/coercer/date"
 require "fido_metadata/coercer/escaped_uri"
 require "fido_metadata/coercer/objects"
+require "fido_metadata/coercer/statement"
 
 module FidoMetadata
   class Entry
@@ -21,5 +22,6 @@ module FidoMetadata
     json_accessor("timeOfLastStatusChange", Coercer::Date)
     json_accessor("rogueListURL", Coercer::EscapedURI)
     json_accessor("rogueListHash")
+    json_accessor("metadataStatement", Coercer::Statement)
   end
 end

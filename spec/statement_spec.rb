@@ -15,21 +15,19 @@ RSpec.describe FidoMetadata::Statement do
       expect(subject).to have_attributes(
         aaid: "1234#5678",
         authenticator_version: 2,
-        attachment_hint: ["INTERNAL"],
-        key_protection: ["HARDWARE", "TEE"],
-        matcher_protection: "TEE",
-        tc_display: ["ANY", "TEE"],
+        attachment_hint: ["internal"],
+        key_protection: ["hardware", "tee"],
+        matcher_protection: ["tee"],
+        tc_display: ["any", "tee"],
         tc_display_content_type: "image/png",
         is_key_restricted: true,
-        is_second_factor_only: false,
-        assertion_scheme: "UAFV1TLV",
-        authentication_algorithm: "SECP256R1_ECDSA_SHA256_RAW",
-        public_key_alg_and_encoding: "ECC_X962_RAW",
-        attestation_types: ["BASIC_FULL"],
+        authentication_algorithms: ["secp256r1_ecdsa_sha256_raw"],
+        public_key_alg_and_encodings: ["ecc_x962_raw"],
+        attestation_types: ["basic_full"],
         upv: [{ "major" => 1, "minor" => 0 }, { "major" => 1, "minor" => 1 }],
       )
       expect(subject.user_verification_details.first.first).to have_attributes(
-        user_verification: "FINGERPRINT"
+        user_verification_method: "fingerprint_internal"
       )
       expect(subject.user_verification_details.first.first.ba_desc).to have_attributes(
         max_templates: 5,
@@ -52,18 +50,20 @@ RSpec.describe FidoMetadata::Statement do
     it "has the expected attributes" do
       expect(subject).to have_attributes(
         authenticator_version: 2,
-        attachment_hint: ["EXTERNAL"],
-        key_protection: ["HARDWARE", "SECURE_ELEMENT"],
-        matcher_protection: "ON_CHIP",
-        is_second_factor_only: true,
-        assertion_scheme: "U2FV1BIN",
-        authentication_algorithm: "SECP256R1_ECDSA_SHA256_RAW",
-        public_key_alg_and_encoding: "ECC_X962_RAW",
-        attestation_types: ["BASIC_FULL"],
-        upv: [{ "major" => 1, "minor" => 0 }],
+        attachment_hint: ["external", "wired", "nfc"],
+        key_protection: ["hardware", "secure_element"],
+        matcher_protection: ["on_chip"],
+        authentication_algorithms: ["secp256r1_ecdsa_sha256_raw"],
+        public_key_alg_and_encodings: ["ecc_x962_raw"],
+        attestation_types: ["basic_full"],
+        upv: [
+          { "major" => 1, "minor" => 0 },
+          { "major" => 1, "minor" => 1 },
+          { "major" => 1, "minor" => 2 },
+        ],
       )
       expect(subject.user_verification_details.first.first).to have_attributes(
-        user_verification: "PRESENCE"
+        user_verification_method: "none"
       )
     end
 
@@ -80,18 +80,38 @@ RSpec.describe FidoMetadata::Statement do
     it "has the expected attributes" do
       expect(subject).to have_attributes(
         aaguid: "0132d110-bf4e-4208-a403-ab4f5f12efe5",
-        authenticator_version: 2,
-        attachment_hint: ["EXTERNAL"],
-        key_protection: ["HARDWARE", "SECURE_ELEMENT"],
-        matcher_protection: "ON_CHIP",
-        assertion_scheme: "FIDOV2",
-        authentication_algorithm: "SECP256R1_ECDSA_SHA256_RAW",
-        public_key_alg_and_encoding: "COSE",
-        attestation_types: ["BASIC_FULL"],
+        authenticator_version: 5,
+        attachment_hint: ["external", "wired", "wireless", "nfc"],
+        key_protection: ["hardware", "secure_element"],
+        matcher_protection: ["on_chip"],
+        authentication_algorithms: ["secp256r1_ecdsa_sha256_raw", "rsassa_pkcsv15_sha256_raw"],
+        public_key_alg_and_encodings: ["cose"],
+        attestation_types: ["basic_full"],
         upv: [{ "major" => 1, "minor" => 0 }],
       )
       expect(subject.user_verification_details.first.first).to have_attributes(
-        user_verification: "PRESENCE"
+        user_verification_method: "none"
+      )
+
+      expect(subject.authenticator_get_info).to have_attributes(
+        versions: ["U2F_V2", "FIDO_2_0"],
+        extensions: ["credProtect", "hmac-secret"],
+        aaguid: "0132d110bf4e4208a403ab4f5f12efe5",
+        options: {
+          "plat" => false,
+          "rk" => true,
+          "clientPin" => true,
+          "up" => true,
+          "uv" => true,
+          "uvToken" => false,
+          "config" => false
+        },
+        max_msg_size: 1200,
+        pin_uv_auth_protocols: [1],
+        max_credential_count_in_list: 16,
+        max_credential_id_length: 128,
+        transports: ["usb", "nfc"],
+        algorithms: [{ "type" => "public-key", "alg" => -7 }, { "type" => "public-key", "alg" => -257 }],
       )
     end
 
