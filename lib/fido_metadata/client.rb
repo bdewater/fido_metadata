@@ -4,7 +4,6 @@ require "jwt"
 require "net/http"
 require "openssl"
 require "fido_metadata/refinement/fixed_length_secure_compare"
-require "fido_metadata/x5c_key_finder"
 require "fido_metadata/version"
 
 module FidoMetadata
@@ -32,7 +31,7 @@ module FidoMetadata
         crls = download_crls(jwt_certificates)
 
         begin
-          X5cKeyFinder.from(jwt_certificates, trusted_certs, crls)
+          JWT::X5cKeyFinder.new(trusted_certs, crls).from(jwt_certificates)
         rescue JWT::VerificationError => e
           raise(UnverifiedSigningKeyError, e.message)
         end
