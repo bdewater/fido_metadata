@@ -20,6 +20,5 @@ jobs:
       with:
         bundler-cache: true # 'bundle install' and cache gems
         ruby-version: ${{ matrix.ruby }}
-        bundler: 2.3.26
     - name: Run tests
       run: bundle exec rake
