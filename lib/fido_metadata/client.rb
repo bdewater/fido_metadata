@@ -74,11 +74,10 @@ module FidoMetadata
     end
 
     def extract_crl_distribution_points(certificates)
-      certificates.map do |certificate|
-        extension = certificate.extensions.detect { |ext| ext.oid == "crlDistributionPoints" }
-        # TODO: replace this with proper parsing of deeply nested ASN1 structures
-        match = extension&.value&.match(/URI:(?<uri>\S*)/)
-        URI(match[:uri]) if match
+      certificates.flat_map do |certificate|
+        certificate.crl_uris.map do |crl_uri|
+          URI(crl_uri)
+        end
       end
     end
   end
