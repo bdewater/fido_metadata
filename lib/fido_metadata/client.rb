@@ -23,9 +23,9 @@ module FidoMetadata
       File.read(File.join(__dir__, "..", "Root.cer"))
     )].freeze
 
-    def download_toc(uri, trusted_certs: FIDO_ROOT_CERTIFICATES)
+    def download_toc(uri, algorithms: ["RS256"], trusted_certs: FIDO_ROOT_CERTIFICATES)
       response = get(uri)
-      payload, _ = JWT.decode(response, nil, true, algorithms: ["RS256"]) do |headers|
+      payload, _ = JWT.decode(response, nil, true, algorithms: algorithms) do |headers|
         jwt_certificates = headers["x5c"].map do |encoded|
           OpenSSL::X509::Certificate.new(Base64.strict_decode64(encoded))
         end
