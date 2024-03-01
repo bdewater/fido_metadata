@@ -47,6 +47,10 @@ module FidoMetadata
       response = http(uri).request(get)
       response.value
       response.body
+    rescue Net::HTTPRetriableError => e
+      if e.response.is_a? Net::HTTPResponse
+        get(URI(e.response["location"]))
+      end
     end
 
     def http(uri)
