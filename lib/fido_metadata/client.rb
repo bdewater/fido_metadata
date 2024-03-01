@@ -4,7 +4,6 @@ require "jwt"
 require "net/http"
 require "openssl"
 require "fido_metadata/refinement/fixed_length_secure_compare"
-require "fido_metadata/x5c_key_finder"
 require "fido_metadata/version"
 
 module FidoMetadata
@@ -32,7 +31,7 @@ module FidoMetadata
         crls = download_crls(jwt_certificates)
 
         begin
-          X5cKeyFinder.from(jwt_certificates, trusted_certs, crls)
+          JWT::X5cKeyFinder.new(trusted_certs, crls).from(jwt_certificates)
         rescue JWT::VerificationError => e
           raise(UnverifiedSigningKeyError, e.message)
         end
@@ -74,11 +73,10 @@ module FidoMetadata
     end
 
     def extract_crl_distribution_points(certificates)
-      certificates.map do |certificate|
-        extension = certificate.extensions.detect { |ext| ext.oid == "crlDistributionPoints" }
-        # TODO: replace this with proper parsing of deeply nested ASN1 structures
-        match = extension&.value&.match(/URI:(?<uri>\S*)/)
-        URI(match[:uri]) if match
+      certificates.flat_map do |certificate|
+        certificate.crl_uris.map do |crl_uri|
+          URI(crl_uri)
+        end
       end
     end
   end

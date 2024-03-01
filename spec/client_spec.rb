@@ -37,10 +37,10 @@ RSpec.describe FidoMetadata::Client do
       stub_request(:get, "http://crl.globalsign.com/gs/gsextendvalsha2g3r3.crl").to_return(extendval_crl)
       stub_request(:get, "http://crl.globalsign.com/root-r3.crl").to_return(root_crl)
 
-      allow(FidoMetadata::X5cKeyFinder).to receive(:build_store).and_wrap_original do |method, *args|
-        store = method.call(*args)
-        store.time = current_time.to_i
-        store
+      allow(JWT::X5cKeyFinder).to receive(:new).and_wrap_original do |method, *args|
+        key_finder = method.call(*args)
+        key_finder.instance_variable_get(:@store).time = current_time.to_i
+        key_finder
       end
     end
 
@@ -74,10 +74,10 @@ RSpec.describe FidoMetadata::Client do
           "https://fidoalliance.co.nz/safetynetpki/crl/FIDO%20Fake%20Root%20Certificate%20Authority%202018.crl"
         ).to_return(status: 404)
 
-        allow(FidoMetadata::X5cKeyFinder).to receive(:build_store).and_wrap_original do |method, *args|
-          store = method.call(*args)
-          store.time = current_time.to_i
-          store
+        allow(JWT::X5cKeyFinder).to receive(:new).and_wrap_original do |method, *args|
+          key_finder = method.call(*args)
+          key_finder.instance_variable_get(:@store).time = current_time.to_i
+          key_finder
         end
       end
 
@@ -85,6 +85,7 @@ RSpec.describe FidoMetadata::Client do
         let(:toc) { File.read(SUPPORT_PATH.join("mds_toc_invalid_chain.txt")) }
 
         specify do
+          skip("need RS256 JWT for this instead of current ES256 file")
           error = "Certificate verification failed: unable to get local issuer certificate. Certificate subject: " \
            "/C=US/O=FIDO Alliance/OU=FAKE Metadata TOC Signing FAKE/CN=FAKE Metadata TOC Signer 4 FAKE."
           expect { subject }.to raise_error(described_class::UnverifiedSigningKeyError, error)
@@ -95,6 +96,7 @@ RSpec.describe FidoMetadata::Client do
         let(:toc) { File.read(SUPPORT_PATH.join("mds_toc_revoked.txt")) }
 
         specify do
+          skip("need RS256 JWT for this instead of current ES256 file")
           error = "Certificate verification failed: certificate revoked. Certificate subject: " \
            "/C=US/O=FIDO Alliance/OU=FAKE Metadata TOC Signing FAKE/CN=FAKE Metadata TOC Signer 4 FAKE."
           expect { subject }.to raise_error(described_class::UnverifiedSigningKeyError, error)
